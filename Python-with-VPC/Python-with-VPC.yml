@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: "AWS::Serverless-2016-10-31"
+Description: An AWS Serverless Specification template for a Python function that has access to S3, VPC interfaces, Cloudtrail Logging, and Secrets Manager.
+Resources:
+  importUsers:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      Handler: app.lambda_handler
+      Runtime: pyhon3.9
+      CodeUri: ./
+      Description: ""
+      MemorySize: 128
+      Timeout: 60
+      Role: >-
+        arn:aws:iam::111111111111:role/service-role/LambdaService-S3AccessReadOnly
