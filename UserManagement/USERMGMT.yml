@@ -1,0 +1,111 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: "AWS::Serverless-2016-10-31"
+Description: An AWS Serverless Specification template for the EmployeeAutomation application for automating Active Directory user management.
+Resources:
+  addUserFromJsonFunction:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      FunctionName: addUserFromJson
+      CodeUri: addUserFromJson/
+      Handler: addUserFromJson.lambda_handler
+      AutoPublishAlias: live
+      Environment:
+        Variables:
+          WEBHOOK_WORKFLOW: >-
+            https://your.powerautomate.workflow.com/
+          LOGIN_PREFIX: yourloginprefix\
+          WEBHOOK_TEAMS: >-
+            https://your.teams.channel.com/
+          GROUP_BASE_DN: OU=yourgroup,OU=ous
+          SERVER_ADDRESS: your.adserver.com
+          SERVER_CA: ./resources/YOURSERVERCERT.crt
+          USER_BASE_DN_01: OU=YourUsers01
+          DOMAIN_BASE_DN: ",DC=yourDomain,DC=com"
+          USER_BASE_DN_02: OU=YourUsers02
+          SECRET_NAME: Your/AWS/SecretName
+          REGION_NAME: yourAWS-region-1
+      Policies:
+        - Version: "2012-10-17"
+          Statement: 
+          - Effect: "Allow"
+            Action: 
+              - "s3:GetObject"
+              - "s3:ListBucket"
+              - "s3:PutObject"
+              - "ec2:CreateNetworkInterface"
+              - "ec2:DeleteNetworkInterface"
+              - "ec2:DescribeNetworkInterfaces"
+              - "logs:CreateLogGroup"
+              - "logs:CreateLogStream"
+              - "logs:PutLogEvents"
+              - "secretsmanager:GetResourcePolicy"
+              - "secretsmanager:GetSecretValue"
+              - "secretsmanager:DescribeSecret"
+              - "secretsmanager:ListSecretVersionIds"
+              - "secretsmanager:GetRandomPassword"
+              - "secretsmanager:ListSecrets"
+            Resource: 
+              - "arn:aws:s3:::*"
+              - !Sub "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:*"
+              - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*"
+              - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:*secret:*"
+      Description: "Adds users from an s3 bucket trigger and creates an Active Directory user with groups assigned by SBU and division."
+      Runtime: python3.9
+      MemorySize: 128
+      Timeout: 30
+      Architectures:
+        - x86_64
+
+  disableUserFromJsonFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: disableUserFromJson/
+      FunctionName: disableUserFromJson
+      Handler: disableUserFromJson.lambda_handler
+      AutoPublishAlias: live
+      Environment:
+        Variables:
+          WEBHOOK_WORKFLOW: >-
+            https://your.powerautomate.workflow.com/
+          LOGIN_PREFIX: yourloginprefix\
+          WEBHOOK_TEAMS: >-
+            https://your.teams.channel.com/
+          GROUP_BASE_DN: OU=yourgroup,OU=ous
+          SERVER_ADDRESS: your.adserver.com
+          SERVER_CA: ./resources/YOURSERVERCERT.crt
+          USER_BASE_DN_01: OU=YourUsers01
+          DOMAIN_BASE_DN: ",DC=yourDomain,DC=com"
+          USER_BASE_DN_02: OU=YourUsers02
+          SECRET_NAME: Your/AWS/SecretName
+          REGION_NAME: yourAWS-region-1
+      Policies:
+        - Version: "2012-10-17"
+          Statement: 
+          - Effect: "Allow"
+            Action: 
+              - "s3:GetObject"
+              - "s3:ListBucket"
+              - "s3:PutObject"
+              - "ec2:CreateNetworkInterface"
+              - "ec2:DeleteNetworkInterface"
+              - "ec2:DescribeNetworkInterfaces"
+              - "logs:CreateLogGroup"
+              - "logs:CreateLogStream"
+              - "logs:PutLogEvents"
+              - "secretsmanager:GetResourcePolicy"
+              - "secretsmanager:GetSecretValue"
+              - "secretsmanager:DescribeSecret"
+              - "secretsmanager:ListSecretVersionIds"
+              - "secretsmanager:GetRandomPassword"
+              - "secretsmanager:ListSecrets"
+            Resource:
+              - "arn:aws:s3:::*"
+              - !Sub "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:*"
+              - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*"
+              - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:*secret:*"
+      Description: "Disables users from a json located in an S3 bucket. Users are disabled or set to expire based on LAST_DAY."
+      Runtime: python3.9
+      Timeout: 30
+      MemorySize: 128
+      Architectures:
+        - x86_64
