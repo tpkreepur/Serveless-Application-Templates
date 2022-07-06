@@ -29,6 +29,7 @@ Resources:
           Statement: 
           - Effect: "Allow"
             Action: 
+              - "lambda:InvokeFunction"
               - "s3:GetObject"
               - "s3:ListBucket"
               - "s3:PutObject"
@@ -44,11 +45,12 @@ Resources:
               - "secretsmanager:ListSecretVersionIds"
               - "secretsmanager:GetRandomPassword"
               - "secretsmanager:ListSecrets"
-            Resource: 
+            Resource:
               - "arn:aws:s3:::*"
               - !Sub "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:*"
               - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*"
               - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:*secret:*"
+              - !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:addUserFromJson"
       Description: "Adds users from an s3 bucket trigger and creates an Active Directory user with groups assigned by SBU and division."
       Runtime: python3.9
       MemorySize: 128
@@ -83,6 +85,7 @@ Resources:
           Statement: 
           - Effect: "Allow"
             Action: 
+              - "lambda:InvokeFunction"
               - "s3:GetObject"
               - "s3:ListBucket"
               - "s3:PutObject"
@@ -103,6 +106,7 @@ Resources:
               - !Sub "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:*"
               - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*"
               - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:*secret:*"
+              - !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:disableUserFromJson"
       Description: "Disables users from a json located in an S3 bucket. Users are disabled or set to expire based on LAST_DAY."
       Runtime: python3.9
       Timeout: 30
